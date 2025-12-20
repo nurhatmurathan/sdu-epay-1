@@ -82,9 +82,10 @@ export const EventsPage:FC = () => {
 
     return (
         <AdminLayout>
-            <div className="flex-1 p-8">
-                <h1 className="text-[32px] font-bold mb-6">Информация о событиях</h1>
+            <div className="flex-1 w-full">
+                <h1 className="text-2xl lg:text-[32px] font-bold mb-4 lg:mb-6">Информация о событиях</h1>
                 <EventFilters />
+                <div className="overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0">
                 <CustomTable
                     columns={columns}
                     data={events}
@@ -99,6 +100,8 @@ export const EventsPage:FC = () => {
                         </div>
                     )}
                 />
+                </div>
+                <div className="mt-4 overflow-x-auto">
                 <Paginator
                     first={first}
                     rows={rows}
@@ -107,6 +110,7 @@ export const EventsPage:FC = () => {
                     onPageChange={onPageChange}
                     className="custom-paginator"
                 />
+                </div>
             </div>
 
             {selectedEvent && (

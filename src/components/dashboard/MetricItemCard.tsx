@@ -9,15 +9,15 @@ interface MetricItemCardProps {
 
 export const MetricItemCard: FC<MetricItemCardProps> = ({ name, num, icon, onClick }) => {
     return (
-        <div onClick={onClick} className="bg-white w-full cursor-pointer rounded-2xl p-5 border border-gray-200 transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-4">
-                <div className="text-gray-500 ">{name}</div>
-                <div className="text-blue-600 bg-blue-100 p-2 rounded-full">
+        <div onClick={onClick} className="bg-white w-full cursor-pointer rounded-2xl p-4 lg:p-5 border border-gray-200 transition-shadow duration-300 hover:shadow-lg">
+            <div className="flex items-center justify-between mb-3 lg:mb-4">
+                <div className="text-gray-500 text-sm lg:text-base">{name}</div>
+                <div className="text-blue-600 bg-blue-100 p-2 rounded-full flex-shrink-0">
                     {icon}
                 </div>
             </div>
             <div>
-                <p className="text-3xl font-bold text-gray-900">{num}</p>
+                <p className="text-2xl lg:text-3xl font-bold text-gray-900">{num}</p>
             </div>
         </div>
     );

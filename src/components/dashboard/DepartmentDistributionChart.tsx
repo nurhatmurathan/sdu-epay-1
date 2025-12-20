@@ -77,11 +77,13 @@ export const DepartmentDistributionChart: FC = () => {
     }, []);
 
     return (
-        <div className="w-full max-w-full px-4">
-            <h2 className="text-xl font-semibold mb-4">Распределение активных событии по департаментам</h2>
-            <div className="bg-white p-6 rounded-2xl w-full">
+        <div className="w-full max-w-full px-2 lg:px-4">
+            <h2 className="text-lg lg:text-xl font-semibold mb-3 lg:mb-4">Распределение активных событии по департаментам</h2>
+            <div className="bg-white p-4 lg:p-6 rounded-2xl w-full overflow-x-auto">
                 {chartData ? (
-                    <Bar data={chartData} options={options} />
+                    <div className="min-w-[300px]">
+                        <Bar data={chartData} options={options} />
+                    </div>
                 ) : (
                     <div>Загрузка...</div>
                 )}

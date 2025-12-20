@@ -4,8 +4,8 @@ import {Container} from "../ui/Container.tsx";
 
 export const LoginPage:FC = () => {
     return (
-        <Container className={"flex flex-col w-fit gap-[20px]"} >
-            <img src="logo.png" alt="logo"/>
+        <Container className={"flex flex-col w-full sm:w-fit gap-[20px] px-4"} >
+            <img src="logo.png" alt="logo" className="w-full max-w-[200px] mx-auto sm:mx-0"/>
             <LoginForm />
         </Container>
     )

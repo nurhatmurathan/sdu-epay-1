@@ -118,14 +118,14 @@ export const SduReader: FC = () => {
     };
 
     return (
-        <div className=" mx-auto mt-10 p-6 bg-white rounded-xl ">
-            <h2 className="text-2xl font-bold mb-4 text-center text-[#006799] ">
+        <div className="mx-auto mt-4 lg:mt-10 p-4 lg:p-6 bg-white rounded-xl">
+            <h2 className="text-xl lg:text-2xl font-bold mb-4 text-center text-[#006799]">
                 Загрузить файл Excel - SDU University
             </h2>
 
             {fileName && (
-                <p className="text-center mt-4 text-gray-600">
-                    <p className="font-medium">Selected file: <span className={"font-bold"}>{fileName}</span> </p>
+                <p className="text-center mt-4 text-gray-600 text-sm lg:text-base">
+                    <span className="font-medium">Selected file: <span className={"font-bold"}>{fileName}</span></span>
                 </p>
             )}
 
@@ -135,10 +135,10 @@ export const SduReader: FC = () => {
                     type="file"
                     accept=".xlsx, .xls"
                     onChange={handleFile}
-                    className="mx-auto block w-full  text-sm text-gray-500
+                    className="mx-auto block w-full text-xs lg:text-sm text-gray-500
             file:mr-4 file:py-2 file:px-4
             file:rounded-lg file:border-0
-            file:text-sm file:font-semibold
+            file:text-xs lg:file:text-sm file:font-semibold
             file:bg-blue-50 file:text-blue-700
             hover:file:bg-blue-100
             cursor-pointer"

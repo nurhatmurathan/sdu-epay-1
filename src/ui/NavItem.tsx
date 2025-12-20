@@ -15,13 +15,13 @@ export const NavItem: FC<NavItemProps> = ({ icon, label, to, onClick}) => {
             to={to}
             onClick={onClick}
             className={({ isActive }) =>
-                `flex items-center gap-3 p-2 rounded-md transition-colors ${
+                `flex items-center gap-2 lg:gap-3 p-2 rounded-md transition-colors text-sm lg:text-base ${
                     isActive ? "bg-[#005B88]" : "hover:bg-[#005B88]"
                 }`
             }
         >
             {icon}
-            <span>{label}</span>
+            <span className="whitespace-nowrap">{label}</span>
         </NavLink>
     );
 };

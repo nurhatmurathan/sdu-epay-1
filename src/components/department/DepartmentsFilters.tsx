@@ -48,15 +48,15 @@ export const DepartmentsFilters:FC = () => {
 
 
     return (
-        <div className="flex justify-between items-end mb-[31px]">
-            <div className="flex gap-[22px]">
-                <div className="flex relative flex-col gap-[10px]">
-                    <label>Название</label>
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4 mb-6 lg:mb-[31px]">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-[22px] w-full lg:w-auto">
+                <div className="flex relative flex-col gap-[10px] flex-1 sm:flex-none">
+                    <label className="text-sm">Название</label>
                     <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="bg-[#FFFFFF]  h-[37px] p-2 border-1 rounded-[4px] border-[#6B9AB0]"
+                    className="bg-[#FFFFFF] h-[37px] p-2 border-1 rounded-[4px] border-[#6B9AB0] text-sm"
                     placeholder="Название департамента"
                         />
                     {showSuggestions && depSuggestions.length > 0 && (
@@ -83,12 +83,12 @@ export const DepartmentsFilters:FC = () => {
                 </div>
                 <CustomButton
                     onClick={handleSearch}
-                    className="h-[37px] px-4 mt-auto text-white rounded-[4px]  transition"
+                    className="h-[37px] px-4 mt-auto text-white rounded-[4px] transition w-full sm:w-auto"
                 >
                     Поиск
                 </CustomButton>
             </div>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 justify-end lg:justify-start">
                 <AddDepartmentModal />
             </div>
         </div>

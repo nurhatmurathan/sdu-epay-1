@@ -75,34 +75,38 @@ export const AdminPage: FC = () => {
 
     return (
         <AdminLayout>
-            <div className="flex-1 p-8">
-                <h1 className="text-[32px] font-bold mb-6">Инфомация о пользователях</h1>
+            <div className="flex-1 w-full">
+                <h1 className="text-2xl lg:text-[32px] font-bold mb-4 lg:mb-6">Инфомация о пользователях</h1>
                 <AdminFilters />
-                <CustomTable
-                    columns={columns}
-                    data={users.filter((user) => user.active)}
-                    actions={(row) => (
-                        <div className="flex gap-2">
-                            <button
-                                className="text-blue-600 hover:text-blue-800"
-                                onClick={() => handleEditClick(row)}
-                            >
-                                <PencilIcon className="w-4 h-4 cursor-pointer" />
-                            </button>
-                            <button onClick={() => handleDeleteClick(row)} className="text-red-600 hover:text-red-800">
-                                <TrashIcon className="w-4 h-4 cursor-pointer" />
-                            </button>
-                        </div>
-                    )}
-                />
-                <Paginator
-                    first={first}
-                    rows={rows}
-                    totalRecords={total}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    onPageChange={onPageChange}
-                    className="custom-paginator"
-                />
+                <div className="overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0">
+                    <CustomTable
+                        columns={columns}
+                        data={users.filter((user) => user.active)}
+                        actions={(row) => (
+                            <div className="flex gap-2">
+                                <button
+                                    className="text-blue-600 hover:text-blue-800"
+                                    onClick={() => handleEditClick(row)}
+                                >
+                                    <PencilIcon className="w-4 h-4 cursor-pointer" />
+                                </button>
+                                <button onClick={() => handleDeleteClick(row)} className="text-red-600 hover:text-red-800">
+                                    <TrashIcon className="w-4 h-4 cursor-pointer" />
+                                </button>
+                            </div>
+                        )}
+                    />
+                </div>
+                <div className="mt-4 overflow-x-auto">
+                    <Paginator
+                        first={first}
+                        rows={rows}
+                        totalRecords={total}
+                        rowsPerPageOptions={[10, 20, 30]}
+                        onPageChange={onPageChange}
+                        className="custom-paginator"
+                    />
+                </div>
             </div>
 
             {selectedAdmin && (

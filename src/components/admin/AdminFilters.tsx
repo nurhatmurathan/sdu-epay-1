@@ -57,15 +57,15 @@ export const AdminFilters: FC = () => {
 
 
     return (
-        <div className="flex justify-between items-end mb-[31px]">
-            <div className="flex gap-[22px]">
-                <div className="flex relative flex-col gap-[10px]">
-                    <label>Почта</label>
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4 mb-6 lg:mb-[31px]">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-[22px] w-full lg:w-auto">
+                <div className="flex relative flex-col gap-[10px] flex-1 sm:flex-none">
+                    <label className="text-sm">Почта</label>
                     <input
                         type="text"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="bg-[#FFFFFF] h-[37px] p-2 border border-[#6B9AB0] rounded-[4px]"
+                        className="bg-[#FFFFFF] h-[37px] p-2 border border-[#6B9AB0] rounded-[4px] text-sm"
                         placeholder="Введите email"
                     />
                     {showSuggestions && mailSuggestions.length > 0 && (
@@ -90,14 +90,14 @@ export const AdminFilters: FC = () => {
                         </AnimatePresence>
                     )}
                 </div>
-                <div className="flex flex-col gap-[10px]">
-                    <label>Роли</label>
+                <div className="flex flex-col gap-[10px] flex-1 sm:flex-none">
+                    <label className="text-sm">Роли</label>
                     <CustomSelect
                         options={roleOptions}
                         value={selectedRole}
                         onChange={(value: string) => setSelectedRole(value as any)}
                         placeholder="Choose role"
-                        triggerClassName="bg-white w-[150px] h-[37px] text-black text-sm"
+                        triggerClassName="bg-white w-full sm:w-[150px] h-[37px] text-black text-sm"
                         dropdownClassName="bg-gray-100"
                         optionClassName="text-sm"
                         activeOptionClassName="bg-blue-200"
@@ -106,12 +106,12 @@ export const AdminFilters: FC = () => {
 
                 <CustomButton
                     onClick={handleSearch}
-                    className="h-[37px] px-4 mt-auto text-white rounded-[4px] transition"
+                    className="h-[37px] px-4 mt-auto text-white rounded-[4px] transition w-full sm:w-auto"
                 >
                     Поиск
                 </CustomButton>
             </div>
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-5 justify-end lg:justify-start">
                 <AddAdminModal />
             </div>
         </div>

@@ -62,7 +62,7 @@ export const DashboardContent: FC = () => {
 
     return (
         <div className="w-full">
-            <div className="flex w-full gap-10 mx-auto justify-around mt-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-10 mt-5">
                 <MetricItemCard
                     icon={<BriefcaseIcon width={50} />}
                     name={"Статистика по транзакциям"}
@@ -91,7 +91,7 @@ export const DashboardContent: FC = () => {
 
             </div>
 
-            <div className="mt-10 min-h-[300px]">
+            <div className="mt-6 lg:mt-10 min-h-[300px] overflow-x-auto">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={active}

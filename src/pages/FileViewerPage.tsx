@@ -8,18 +8,18 @@ export const FileViewerPage:FC = () => {
     const [select, setSelect] = useState(0);
     return (
        <AdminLayout>
-           <div className={"p-12"}>
-               <div>
-                   <p className="font-bold text-[32px] mb-[20px]">Просмотр Excel файлов</p>
-                   <span className="text-[20px] font-light">
+           <div className={"w-full"}>
+               <div className="mb-6 lg:mb-0">
+                   <p className="font-bold text-xl lg:text-[32px] mb-3 lg:mb-[20px]">Просмотр Excel файлов</p>
+                   <span className="text-base lg:text-[20px] font-light">
                       Загрузите Excel-файл ниже, чтобы просмотреть детали транзакций. (Если возникли проблемы с отображением, попробуйте перезагрузить страницу)
                    </span>
                </div>
-               <div className={"flex gap-5 mt-[50px]"}>
-                   <CustomButton onClick={() => setSelect(1)}>SDU University</CustomButton>
-                   <CustomButton onClick={() => setSelect(2)}>Dormitory</CustomButton>
+               <div className={"flex flex-col sm:flex-row gap-3 lg:gap-5 mt-6 lg:mt-[50px]"}>
+                   <CustomButton onClick={() => setSelect(1)} className="w-full sm:w-auto">SDU University</CustomButton>
+                   <CustomButton onClick={() => setSelect(2)} className="w-full sm:w-auto">Dormitory</CustomButton>
                </div>
-               <div className="mt-8">
+               <div className="mt-6 lg:mt-8">
                    {select === 1 && <SduReader />}
                    {select === 2 && <DormReader />}
                </div>

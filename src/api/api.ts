@@ -20,8 +20,10 @@ const processQueue = (error: unknown, token?: string) => {
     failedQueue = [];
 };
 
+const API_URL = import.meta.env.VITE_API_URL || "https://epay.sdu.edu.kz/api/api";
+
 export const api = axios.create({
-    baseURL: "https://epay.sdu.edu.kz/api/api",
+    baseURL: API_URL,
 });
 
 api.interceptors.request.use(
@@ -59,7 +61,7 @@ api.interceptors.response.use(
                 const refresh = getRefreshToken();
                 if (!refresh) throw new Error("No refresh token");
 
-                const response = await axios.post("https://epay.sdu.edu.kz/api/api/auth/login/refresh", {
+                const response = await axios.post(`${API_URL}/auth/login/refresh`, {
                     refresh,
                 });
 

@@ -32,10 +32,10 @@ export const CustomTable: FC<CustomTableProps> = ({ columns, data, actions }) =>
 
     return (
         <div className="overflow-x-auto rounded-[4px] shadow-md border border-gray-200">
-            <table className="min-w-full divide-y divide-gray-200 bg-white text-[16px] text-left">
-                <thead className="bg-blue-50 text-gray-700 uppercase text-[16px] font-semibold">
+            <table className="min-w-full divide-y divide-gray-200 bg-white text-sm lg:text-[16px] text-left">
+                <thead className="bg-blue-50 text-gray-700 uppercase text-sm lg:text-[16px] font-semibold">
                 <tr>
-                    <th className="px-4 py-3">
+                    <th className="px-2 lg:px-4 py-2 lg:py-3">
                         <input
                             type="checkbox"
                             checked={isAllSelected}
@@ -44,20 +44,20 @@ export const CustomTable: FC<CustomTableProps> = ({ columns, data, actions }) =>
                         />
                     </th>
                     {columns.map(col => (
-                        <th key={col.accessor} className="px-6 py-3">
+                        <th key={col.accessor} className="px-3 lg:px-6 py-2 lg:py-3 whitespace-nowrap">
                             {col.header}
                         </th>
                     ))}
-                    {actions && <th className="px-6 py-3">Действия</th>}
+                    {actions && <th className="px-3 lg:px-6 py-2 lg:py-3 whitespace-nowrap">Действия</th>}
                 </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-[16px]">
+                <tbody className="divide-y divide-gray-100 text-sm lg:text-[16px]">
                 {data.map((row, idx) => (
                     <tr
                         key={idx}
                         className={`transition-all hover:bg-blue-50 ${selectedRows.includes(idx) ? "bg-blue-100" : ""}`}
                     >
-                        <td className="px-4 py-4">
+                        <td className="px-2 lg:px-4 py-3 lg:py-4">
                             <input
                                 type="checkbox"
                                 checked={selectedRows.includes(idx)}
@@ -66,15 +66,17 @@ export const CustomTable: FC<CustomTableProps> = ({ columns, data, actions }) =>
                             />
                         </td>
                         {columns.map(col => (
-                            <td key={col.accessor} className="px-6 py-4 text-gray-800">
-                                {typeof row[col.accessor] === "object"
-                                    ? row[col.accessor]?.name ?? "-"
-                                    : row[col.accessor]}
+                            <td key={col.accessor} className="px-3 lg:px-6 py-3 lg:py-4 text-gray-800">
+                                <div className="truncate max-w-[150px] lg:max-w-none">
+                                    {typeof row[col.accessor] === "object"
+                                        ? row[col.accessor]?.name ?? "-"
+                                        : row[col.accessor]}
+                                </div>
                             </td>
                         ))}
 
                         {actions && (
-                            <td className="px-6 py-4">
+                            <td className="px-3 lg:px-6 py-3 lg:py-4">
                                 {actions(row)}
                             </td>
                         )}

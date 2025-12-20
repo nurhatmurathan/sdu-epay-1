@@ -154,26 +154,26 @@ export const TransactionLineChart: FC = () => {
     };
 
     return (
-        <div className="w-full max-w-full px-4">
-            <h2 className="text-xl font-semibold mb-4">График транзакций</h2>
+        <div className="w-full max-w-full px-2 lg:px-4">
+            <h2 className="text-lg lg:text-xl font-semibold mb-3 lg:mb-4">График транзакций</h2>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-center mb-6">
-                <label className="flex flex-col">
-                    Выберите диапазон дат:
+            <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 items-start sm:items-center mb-4 lg:mb-6">
+                <label className="flex flex-col w-full sm:w-auto">
+                    <span className="text-sm mb-1">Выберите диапазон дат:</span>
                     <Calendar
                         selectionMode="range"
                         value={dateRange}
                         onChange={(e) => setDateRange(e.value as [Date, Date])}
                         view="date"
                         dateFormat="dd/mm/yy"
-                        className="bg-white"
+                        className="bg-white w-full sm:w-auto"
                         showIcon
                         showButtonBar
                     />
                 </label>
 
-                <label className="flex flex-col">
-                    Быстрый выбор периода:
+                <label className="flex flex-col w-full sm:w-auto">
+                    <span className="text-sm mb-1">Быстрый выбор периода:</span>
                     <Dropdown
                         value={selectedPreset}
                         options={predefinedRanges}
@@ -182,13 +182,19 @@ export const TransactionLineChart: FC = () => {
                             applyPresetRange(e.value);
                         }}
                         placeholder="Выбрать"
-                        className="w-full min-w-[12rem]"
+                        className="w-full sm:min-w-[12rem]"
                     />
                 </label>
             </div>
 
-            <div className="bg-white p-6 rounded-2xl w-full">
-                {chartData ? <Line data={chartData} options={options} /> : <p>За этот период нету данных</p>}
+            <div className="bg-white p-4 lg:p-6 rounded-2xl w-full overflow-x-auto">
+                {chartData ? (
+                    <div className="min-w-[300px]">
+                        <Line data={chartData} options={options} />
+                    </div>
+                ) : (
+                    <p>За этот период нету данных</p>
+                )}
             </div>
         </div>
     );

@@ -86,31 +86,35 @@ export const PromoCodesPage:FC = () => {
 
     return (
         <AdminLayout>
-            <div className="flex-1 p-8">
-                <h1 className="text-[32px] font-bold mb-6">Информация о промо-кодах</h1>
+            <div className="flex-1 w-full">
+                <h1 className="text-2xl lg:text-[32px] font-bold mb-4 lg:mb-6">Информация о промо-кодах</h1>
                 <PromoCodeFilters/>
-                <CustomTable
-                    columns={columns}
-                    data={formattedData}
-                    actions={(row) => (
-                        <div className="flex gap-2">
-                            <button onClick={() => handleEditClick(row)} className="text-blue-600 hover:text-blue-800">
-                                <PencilIcon className="w-4 cursor-pointer h-4" />
-                            </button>
-                            <button onClick={() => handleDeleteClick(row)} className="text-red-600 hover:text-red-800">
-                                <TrashIcon className="w-4 cursor-pointer h-4" />
-                            </button>
-                        </div>
-                    )}
-                />
-                <Paginator
-                    first={first}
-                    rows={rows}
-                    totalRecords={total}
-                    rowsPerPageOptions={[10, 20, 30]}
-                    onPageChange={onPageChange}
-                    className="custom-paginator"
-                />
+                <div className="overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0">
+                    <CustomTable
+                        columns={columns}
+                        data={formattedData}
+                        actions={(row) => (
+                            <div className="flex gap-2">
+                                <button onClick={() => handleEditClick(row)} className="text-blue-600 hover:text-blue-800">
+                                    <PencilIcon className="w-4 cursor-pointer h-4" />
+                                </button>
+                                <button onClick={() => handleDeleteClick(row)} className="text-red-600 hover:text-red-800">
+                                    <TrashIcon className="w-4 cursor-pointer h-4" />
+                                </button>
+                            </div>
+                        )}
+                    />
+                </div>
+                <div className="mt-4 overflow-x-auto">
+                    <Paginator
+                        first={first}
+                        rows={rows}
+                        totalRecords={total}
+                        rowsPerPageOptions={[10, 20, 30]}
+                        onPageChange={onPageChange}
+                        className="custom-paginator"
+                    />
+                </div>
             </div>
 
             {selectedPromo && (

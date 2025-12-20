@@ -158,3 +158,29 @@ body{
     width: 28px;
     font-size: 16px;
 }
+
+/* Адаптивные стили для пагинатора */
+@media (max-width: 640px) {
+    .custom-paginator {
+        font-size: 12px !important;
+    }
+    
+    .custom-paginator .p-paginator-pages .p-paginator-page,
+    .custom-paginator .p-paginator-prev,
+    .custom-paginator .p-paginator-next {
+        height: 32px !important;
+        min-width: 32px !important;
+        font-size: 14px !important;
+    }
+    
+    .custom-paginator .p-dropdown {
+        height: 32px;
+        font-size: 12px;
+    }
+    
+    .custom-paginator .p-dropdown .p-dropdown-label {
+        line-height: 32px;
+        font-size: 12px;
+        padding: 0 4px;
+    }
+}

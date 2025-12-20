@@ -107,7 +107,7 @@ export const SideBar: FC = () => {
                         </>
                     ) : (
                         <>
-                            <img src="logo-2.png" alt="logo" className="w-8 h-8 max-md:mt-10" />
+                            <img src="logo-3.png" alt="logo" className="w-8 h-8 max-md:mt-10" />
                             <button
                                 onClick={toggleSidebar}
                                 className="hidden lg:flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#005B88] transition-colors absolute top-2 right-2"

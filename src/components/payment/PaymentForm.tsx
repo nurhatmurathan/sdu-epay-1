@@ -448,17 +448,19 @@ export const PaymentForm: FC = () => {
                         {
                             selectedDepartmentType==="EVENT_BASED" ? (
                                     <>
-                                        <Controller
-                                            name="promo_code"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <PromocodeInput promoCodeField={{
-                                                    ...field,
-                                                    value: field.value ?? undefined
-                                                }} />
+                                        {selectedEventPriced !== false && (
+                                            <Controller
+                                                name="promo_code"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <PromocodeInput promoCodeField={{
+                                                        ...field,
+                                                        value: field.value ?? undefined
+                                                    }} />
 
-                                            )}
-                                        />
+                                                )}
+                                            />
+                                        )}
 
                                         {selectedEventPriced === false && (
                                             <Controller
@@ -485,7 +487,8 @@ export const PaymentForm: FC = () => {
                                             />
                                         )}
 
-                                        <CheckOut /></>
+                                        {selectedEventPriced !== false && <CheckOut />}
+                                    </>
                             ) : (
                                 <Controller
                                     name="amount"

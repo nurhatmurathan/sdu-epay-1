@@ -24,6 +24,10 @@ export const PromocodeInput: FC<Props> = ({ promoCodeField }) => {
             return toast.error(t("paymentPage.promocode.toasts.empty"));
         }
 
+        if (!order.event_id) {
+            return toast.error("Выберите событие");
+        }
+
         const errorMessage = await verifyPromo({
             code: promoCodeField.value,
             event_id: order.event_id,

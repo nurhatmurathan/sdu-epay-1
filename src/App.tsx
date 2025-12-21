@@ -14,6 +14,7 @@ import {FailPaymentPage} from "@/components/payment/FailPaymentPage.tsx";
 import {DashboardPage} from "@/pages/DashboardPage.tsx";
 import {Toaster} from "react-hot-toast";
 import {FileViewerPage} from "@/pages/FileViewerPage.tsx";
+import {OrdersPage} from "@/pages/OrdersPage.tsx";
 
 
 function App() {
@@ -51,6 +52,12 @@ function App() {
               <Route path="/file-reader" element={
                   <ReauireAuth>
                       <FileViewerPage />
+                  </ReauireAuth>
+              }
+              />
+              <Route path="/orders" element={
+                  <ReauireAuth>
+                      <OrdersPage />
                   </ReauireAuth>
               }
               />

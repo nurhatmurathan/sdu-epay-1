@@ -3,6 +3,7 @@ import { FC, ReactNode, useState } from "react";
 interface Column {
     header: string;
     accessor: string;
+    cellClassName?: (value: any, row: Record<string, any>) => string;
 }
 
 interface CustomTableProps {
@@ -65,15 +66,20 @@ export const CustomTable: FC<CustomTableProps> = ({ columns, data, actions }) =>
                                 className="accent-blue-600"
                             />
                         </td>
-                        {columns.map(col => (
-                            <td key={col.accessor} className="px-3 lg:px-6 py-3 lg:py-4 text-gray-800">
-                                <div className="truncate" title={typeof row[col.accessor] === "object" ? row[col.accessor]?.name ?? "-" : String(row[col.accessor] ?? "")}>
-                                    {typeof row[col.accessor] === "object"
-                                        ? row[col.accessor]?.name ?? "-"
-                                        : row[col.accessor] ?? "-"}
-                                </div>
-                            </td>
-                        ))}
+                        {columns.map(col => {
+                            const cellValue = typeof row[col.accessor] === "object"
+                                ? row[col.accessor]?.name ?? "-"
+                                : row[col.accessor] ?? "-";
+                            const customClass = col.cellClassName ? col.cellClassName(row[col.accessor], row) : "";
+                            
+                            return (
+                                <td key={col.accessor} className="px-3 lg:px-6 py-3 lg:py-4 text-gray-800">
+                                    <div className={`truncate ${customClass}`} title={typeof row[col.accessor] === "object" ? row[col.accessor]?.name ?? "-" : String(row[col.accessor] ?? "")}>
+                                        {cellValue}
+                                    </div>
+                                </td>
+                            );
+                        })}
 
                         {actions && (
                             <td className="px-3 lg:px-6 py-3 lg:py-4 whitespace-nowrap">

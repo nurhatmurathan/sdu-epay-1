@@ -1,0 +1,256 @@
+import { FC, useEffect, useState } from "react";
+import { CustomModal } from "@/ui/CustomModal.tsx";
+import { Order, OrderDetails } from "@/types/orders.ts";
+import { getOrderById } from "@/api/endpoints/orders.ts";
+import { PulseLoader } from "react-spinners";
+
+interface OrderDetailsModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    order: Order | null;
+}
+
+export const OrderDetailsModal: FC<OrderDetailsModalProps> = ({ isOpen, onClose, order }) => {
+    const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchOrderDetails = async () => {
+            if (!order || !isOpen) return;
+            
+            setLoading(true);
+            try {
+                const details = await getOrderById(order.id);
+                setOrderDetails(details);
+            } catch (error) {
+                console.error("Failed to fetch order details:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrderDetails();
+    }, [order, isOpen]);
+
+    if (!order) return null;
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleString("ru-RU", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        });
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case "SUCCESS":
+                return "text-green-600";
+            case "FAILURE":
+                return "text-red-600";
+            case "PENDING":
+                return "text-yellow-600";
+            default:
+                return "";
+        }
+    };
+
+    const getStatusText = (status: string) => {
+        switch (status) {
+            case "SUCCESS":
+                return "Успешно";
+            case "FAILURE":
+                return "Ошибка";
+            case "PENDING":
+                return "В ожидании";
+            default:
+                return status;
+        }
+    };
+
+    if (loading) {
+        return (
+            <CustomModal
+                title={`Детали заказа #${order.id}`}
+                isOpen={isOpen}
+                className="max-w-2xl w-full"
+                onClose={onClose}
+            >
+                <div className="flex justify-center items-center py-8">
+                    <PulseLoader size={10} color="#006799" />
+                </div>
+            </CustomModal>
+        );
+    }
+
+    if (!orderDetails) {
+        return (
+            <CustomModal
+                title={`Детали заказа #${order.id}`}
+                isOpen={isOpen}
+                className="max-w-2xl w-full"
+                onClose={onClose}
+            >
+                <div className="text-center py-8 text-gray-500">
+                    Не удалось загрузить детали заказа
+                </div>
+            </CustomModal>
+        );
+    }
+
+    return (
+        <CustomModal
+            title={`Детали заказа #${order.id}`}
+            isOpen={isOpen}
+            className="max-w-2xl w-full"
+            onClose={onClose}
+        >
+            <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <p className="text-sm text-gray-500">Имя клиента</p>
+                        <p className="font-semibold">{orderDetails.fullname}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Email</p>
+                        <p className="font-semibold">{orderDetails.email}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Телефон</p>
+                        <p className="font-semibold">{orderDetails.cellphone}</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Тип оплаты</p>
+                        <p className="font-semibold">
+                            {orderDetails.type === "KASPI" ? "Kaspi" : "Halyk"}
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Статус</p>
+                        <p className={`font-semibold ${getStatusColor(orderDetails.status)}`}>
+                            {getStatusText(orderDetails.status)}
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Сумма</p>
+                        <p className="font-semibold">{orderDetails.amount} ₸</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Итоговая сумма</p>
+                        <p className="font-semibold text-lg text-blue-600">{orderDetails.final_amount} ₸</p>
+                    </div>
+                    <div>
+                        <p className="text-sm text-gray-500">Скидка</p>
+                        <p className="font-semibold text-green-600">
+                            {orderDetails.amount - orderDetails.final_amount > 0
+                                ? `${orderDetails.amount - orderDetails.final_amount} ₸`
+                                : "Нет"}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Department Info */}
+                <div className="bg-blue-50 p-4 rounded-md">
+                    <h3 className="font-semibold text-blue-900 mb-2">Департамент</h3>
+                    <div className="grid grid-cols-2 gap-2">
+                        <div>
+                            <p className="text-sm text-gray-600">Название</p>
+                            <p className="font-semibold">{orderDetails.department?.name}</p>
+                        </div>
+                        <div>
+                            <p className="text-sm text-gray-600">Тип</p>
+                            <p className="font-semibold">
+                                {orderDetails.department?.type === "EVENT_BASED" ? "На основе событий" : "Самостоятельная оплата"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Event Info */}
+                {orderDetails.event && (
+                    <div className="bg-green-50 p-4 rounded-md">
+                        <h3 className="font-semibold text-green-900 mb-2">Событие</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <p className="text-sm text-gray-600">Название</p>
+                                <p className="font-semibold">{orderDetails.event.title}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-600">Email менеджера</p>
+                                <p className="font-semibold text-sm">{orderDetails.event.manager_email}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-600">Цена</p>
+                                <p className="font-semibold">
+                                    {orderDetails.event.priced ? `${orderDetails.event.price} ₸` : "Произвольная"}
+                                </p>
+                            </div>
+                            {!orderDetails.event.without_period && (
+                                <div>
+                                    <p className="text-sm text-gray-600">Период</p>
+                                    <p className="font-semibold text-sm">
+                                        {orderDetails.event.period_from} - {orderDetails.event.period_till}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Promo Code Info */}
+                {orderDetails.promo_code && (
+                    <div className="bg-purple-50 p-4 rounded-md">
+                        <h3 className="font-semibold text-purple-900 mb-2">Промокод</h3>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div>
+                                <p className="text-sm text-gray-600">Код</p>
+                                <p className="font-semibold">{orderDetails.promo_code.code}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-600">Скидка</p>
+                                <p className="font-semibold text-purple-600">{orderDetails.promo_code.discount}%</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {orderDetails.additional && (
+                    <div>
+                        <p className="text-sm text-gray-500">Дополнительная информация</p>
+                        <p className="font-semibold">{orderDetails.additional}</p>
+                    </div>
+                )}
+
+                {orderDetails.additional_fields && Object.keys(orderDetails.additional_fields).length > 0 && (
+                    <div>
+                        <p className="text-sm text-gray-500 mb-2">Дополнительные поля</p>
+                        <div className="bg-gray-50 p-3 rounded-md">
+                            {Object.entries(orderDetails.additional_fields).map(([key, value]) => (
+                                <div key={key} className="flex justify-between py-1">
+                                    <span className="text-gray-600">{key}:</span>
+                                    <span className="font-semibold">
+                                        {typeof value === "boolean"
+                                            ? value
+                                                ? "Да"
+                                                : "Нет"
+                                            : String(value)}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <div className="pt-4 border-t">
+                    <p className="text-sm text-gray-500">Дата создания</p>
+                    <p className="font-semibold text-sm">{formatDate(orderDetails.created_at)}</p>
+                </div>
+            </div>
+        </CustomModal>
+    );
+};
+

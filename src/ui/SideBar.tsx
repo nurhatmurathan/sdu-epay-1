@@ -12,6 +12,7 @@ import {
     XMarkIcon,
     ChevronLeftIcon,
     ChevronRightIcon,
+    ShoppingCartIcon,
 } from "@heroicons/react/24/outline";
 import { clearTokens } from "@/api/utils/tokenUtils.ts";
 import { useUserData } from "@/hooks/useUserData.ts";
@@ -45,6 +46,12 @@ const navItems = [
         label: "Промокоды",
         to: "/promo-codes",
         icon: <ReceiptPercentIcon width={20} />,
+        roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
+    },
+    {
+        label: "Заказы",
+        to: "/orders",
+        icon: <ShoppingCartIcon width={20} />,
         roles: ["SUPER_ADMIN", "ADMIN", "MANAGER"],
     },
     {
@@ -87,7 +94,7 @@ export const SideBar: FC = () => {
 
             {/* Sidebar */}
             <aside
-                className={`fixed lg:static h-screen bg-[#006799] text-white flex flex-col z-40 transform transition-all duration-300 ${
+                className={`fixed lg:sticky lg:top-0 h-screen lg:min-h-screen bg-[#006799] text-white flex flex-col z-40 transform transition-all duration-300 ${
                     isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
                 } ${
                     isCollapsed ? "w-20" : "w-64"

@@ -28,3 +28,21 @@ export const getOrderTransactions = async (orderId: number): Promise<OrderTransa
     return data;
 }
 
+export const exportOrders = async (query?: OrderQuery): Promise<Blob> => {
+    const queryString = query
+        ? '?' + new URLSearchParams(
+            Object.entries(query).reduce((acc, [key, value]) => {
+                if (value !== undefined && value !== null) {
+                    acc[key] = String(value);
+                }
+                return acc;
+            }, {} as Record<string, string>)
+        ).toString()
+        : '';
+
+    const { data } = await api.get(`/orders/export${queryString}`, {
+        responseType: 'blob'
+    });
+    return data;
+}
+

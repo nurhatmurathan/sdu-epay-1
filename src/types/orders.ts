@@ -65,6 +65,8 @@ export interface OrderQuery {
     department?: string | null;
     event?: string | null;
     promo_code?: string | null;
+    start_date?: string | null;
+    end_date?: string | null;
     page?: number;
     size?: number;
 }

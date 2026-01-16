@@ -4,6 +4,7 @@ export interface IEvent {
     manager_email?: string;
     priced?: boolean;
     price?: number;
+    price_usd?: number;
     without_period?: boolean;
     period_from?: string,
     period_till?: string,
@@ -25,6 +26,7 @@ export interface UpdateEventPayload {
     manager_email: string;
     priced: boolean;
     price: number;
+    price_usd?: number;
     without_period: boolean;
     period_from?: string | null;
     period_till?: string | null;

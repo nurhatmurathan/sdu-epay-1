@@ -9,6 +9,7 @@ export interface Order {
     status: "PENDING" | "SUCCESS" | "FAILURE";
     amount: number;
     final_amount: number;
+    currency?: "KZT" | "USD";
     department_id?: string;
     event_id?: string;
     promo_code_id?: string;
@@ -27,6 +28,7 @@ export interface OrderDetails {
     status: "PENDING" | "SUCCESS" | "FAILURE";
     amount: number;
     final_amount: number;
+    currency?: "KZT" | "USD";
     created_at: string;
     department: {
         name: string;
@@ -39,6 +41,7 @@ export interface OrderDetails {
         manager_email: string;
         priced: boolean;
         price: number;
+        price_usd?: number;
         without_period: boolean;
         period_from: string;
         period_till: string;
@@ -87,4 +90,5 @@ export interface IOrder {
     additional?: string;
     additional_fields?: Record<string, any> | null;
     amount?: number;
+    currency?: "KZT" | "USD";
 }

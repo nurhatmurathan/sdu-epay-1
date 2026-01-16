@@ -3,7 +3,8 @@ import { CustomButton } from "@/ui/CustomButton.tsx";
 import {
     EnvelopeIcon,
     PlusIcon,
-    UserCircleIcon
+    UserCircleIcon,
+    CurrencyDollarIcon
 } from "@heroicons/react/24/outline";
 import { CustomModal } from "@/ui/CustomModal.tsx";
 import { CustomInput } from "@/ui/CustomInput.tsx";
@@ -22,6 +23,7 @@ export const AddEventModal: FC = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [price, setPrice] = useState(0);
+    const [priceUsd, setPriceUsd] = useState(0);
     const [priced, setPriced] = useState(true);
     const [withoutPeriod, setWithoutPeriod] = useState(false);
     const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -31,6 +33,7 @@ export const AddEventModal: FC = () => {
         email: false,
         department: false,
         price: false,
+        priceUsd: false,
         dates: false,
     });
 
@@ -65,6 +68,7 @@ export const AddEventModal: FC = () => {
             email: !email || !emailRegex.test(email),
             department: !selectedDepartment,
             price: priced && (!price || price <= 0),
+            priceUsd: priced && priceUsd < 0,
             dates: !withoutPeriod && (!periodFrom || !periodTo),
         };
 
@@ -79,7 +83,8 @@ export const AddEventModal: FC = () => {
             messages.push("Неверный формат email");
         }
         if (newErrors.department) messages.push("Необходимо выбрать департамент");
-        if (newErrors.price) messages.push("Укажите корректную цену");
+        if (newErrors.price) messages.push("Укажите корректную цену в KZT");
+        if (newErrors.priceUsd) messages.push("Цена в USD не может быть отрицательной");
         if (newErrors.dates) messages.push("Необходимо указать период проведения");
 
         if (messages.length > 0) {
@@ -95,9 +100,10 @@ export const AddEventModal: FC = () => {
                 department_id: selectedDepartment,
                 priced: priced,
                 price: priced ? price : 0,
+                price_usd: priced && priceUsd > 0 ? priceUsd : undefined,
                 without_period: withoutPeriod,
-                ...(withoutPeriod 
-                    ? {} 
+                ...(withoutPeriod
+                    ? {}
                     : { period_from: periodFrom!, period_till: periodTo! }
                 ),
             });
@@ -109,6 +115,7 @@ export const AddEventModal: FC = () => {
             setName("");
             setEmail("");
             setPrice(0);
+            setPriceUsd(0);
             setPriced(true);
             setWithoutPeriod(false);
             setSelectedDepartment("");
@@ -118,6 +125,7 @@ export const AddEventModal: FC = () => {
                 email: false,
                 department: false,
                 price: false,
+                priceUsd: false,
                 dates: false,
             });
         } catch (err:any) {
@@ -180,14 +188,24 @@ export const AddEventModal: FC = () => {
                     </div>
 
                     {priced && (
-                        <CustomInput
-                            value={String(price)}
-                            onChange={(e) => setPrice(Number(e.target.value))}
-                            icon={<TengeIcon  color={errors.price ? "#fb2c36" : "#6B9AB0"} />}
-                            placeholder="Введите цену"
-                            type="number"
-                            className={errors.price ? "border border-red-500" : ""}
-                        />
+                        <>
+                            <CustomInput
+                                value={String(price)}
+                                onChange={(e) => setPrice(Number(e.target.value))}
+                                icon={<TengeIcon  color={errors.price ? "#fb2c36" : "#6B9AB0"} />}
+                                placeholder="Введите цену в KZT (обязательно)"
+                                type="number"
+                                className={errors.price ? "border border-red-500" : ""}
+                            />
+                            <CustomInput
+                                value={String(priceUsd)}
+                                onChange={(e) => setPriceUsd(Number(e.target.value))}
+                                icon={<CurrencyDollarIcon className={errors.priceUsd ? "text-red-500" : "text-[#6B9AB0]"} />}
+                                placeholder="Введите цену в USD (опционально)"
+                                type="number"
+                                className={errors.priceUsd ? "border border-red-500" : ""}
+                            />
+                        </>
                     )}
 
                     <div className="flex items-center gap-2">

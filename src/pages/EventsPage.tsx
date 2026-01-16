@@ -24,7 +24,8 @@ export const EventsPage:FC = () => {
         { header: "Email", accessor: "manager_email" },
         { header: "Период с", accessor: "period_from" },
         { header: "Период по", accessor: "period_till" },
-        { header: "Цена", accessor: "price_display" },
+        { header: "Цена (Resident)", accessor: "price_kzt_display" },
+        { header: "Цена (Non-resident)", accessor: "price_usd_display" },
     ];
 
 
@@ -90,7 +91,10 @@ export const EventsPage:FC = () => {
                     columns={columns}
                     data={events.map((event: any) => ({
                         ...event,
-                        price_display: event.priced ? `${event.price} ₸` : "Произвольная"
+                        price_kzt_display: event.priced ? `${event.price} ₸` : "Произвольная",
+                        price_usd_display: event.priced
+                            ? (event.price_usd ? `$${event.price_usd}` : "—")
+                            : "Произвольная"
                     }))}
                     actions={(row) => (
                         <div className="flex gap-2">

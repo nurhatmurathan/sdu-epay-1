@@ -32,6 +32,7 @@ interface FormValues {
     additional: string;
     paymentMethod: string;
     amount: number | null;
+    residencyStatus: "resident" | "non-resident" | null;
 }
 
 
@@ -56,13 +57,16 @@ export const usePaymentSchema = (departmentType: DepartmentType | null, eventPri
         amount: departmentType === "SELF_PAY" || (departmentType === "EVENT_BASED" && eventPriced === false)
             ? yup.number().typeError(t("paymentPage.errors.amount")).required(t("paymentPage.errors.amount"))
             : yup.number().nullable().optional(),
+        residencyStatus: departmentType === "EVENT_BASED"
+            ? yup.string().required("Residency status is required")
+            : yup.string().nullable().optional(),
     });
 };
 
 
 
 export const PaymentForm: FC = () => {
-    const {setPrice, setOrderField} = usePaymentStore();
+    const {setPrice, setOrderField, setCurrency} = usePaymentStore();
     const { t } = useTranslation();
 
     const [selectedDepartmentId, setSelectedDepartmentId] = useState("");
@@ -76,6 +80,8 @@ export const PaymentForm: FC = () => {
     const [additionalFieldValues, setAdditionalFieldValues] = useState<Record<string, string | boolean>>({});
     const [selectedDepartmentType, setSelectedDepartmentType] = useState<DepartmentType | null>(null);
     const [selectedEventPriced, setSelectedEventPriced] = useState<boolean | null>(null);
+    const [selectedEventPriceUsd, setSelectedEventPriceUsd] = useState<number | null>(null);
+    const [selectedEventPriceKzt, setSelectedEventPriceKzt] = useState<number | null>(null);
 
 
 
@@ -108,6 +114,7 @@ export const PaymentForm: FC = () => {
                     label: event.title || '',
                     value: event.id || '',
                     price: Number(event.price || 0),
+                    price_usd: event.price_usd ? Number(event.price_usd) : null,
                     priced: event.priced ?? true,
                 })).filter(event => event.label && event.value);
                 setEventOptions(mapped);
@@ -126,6 +133,7 @@ export const PaymentForm: FC = () => {
         control,
         handleSubmit,
         setValue,
+        watch,
         formState: { errors }
     } = useForm<FormValues>({
         resolver: yupResolver(schema) as never,
@@ -138,9 +146,13 @@ export const PaymentForm: FC = () => {
             additional: '',
             promo_code: null,
             paymentMethod: '',
-            amount: null
+            amount: null,
+            residencyStatus: null
         }
     });
+
+    const watchResidencyStatus = watch("residencyStatus");
+    const watchPaymentMethod = watch("paymentMethod");
 
     const handleAdditionalChange = (key: string, value: any) => {
         const formattedValue =
@@ -155,11 +167,25 @@ export const PaymentForm: FC = () => {
 
     const onSubmit: SubmitHandler<FormValues> = async (data) => {
         console.log("data", data);
+
+        // Validate Kaspi doesn't support non-resident (USD)
+        if (data.paymentMethod === "KaspiBank" && data.residencyStatus === "non-resident") {
+            toast.error("Kaspi Bank does not support USD payments. Please select HalykBank for non-resident payments or change to Resident.");
+            return;
+        }
+
         setLoading(true);
         try {
+            // Determine currency based on payment method and residency status
+            let currency: "KZT" | "USD" = "KZT";
+            if (data.paymentMethod === "HalykBank" && data.residencyStatus === "non-resident") {
+                currency = "USD";
+            }
+
             const payload = {
                 ...data,
-                additional_fields: additionalFieldValues
+                additional_fields: additionalFieldValues,
+                currency
             };
 
 
@@ -168,19 +194,23 @@ export const PaymentForm: FC = () => {
                     if (selectedEventPriced === false) {
                         // Если событие без фиксированной цены, используем эндпоинт event-custom-price
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        const { paymentMethod, department_id, promo_code, ...customPriceData } = payload;
+                        const { paymentMethod, department_id, promo_code, residencyStatus, ...customPriceData } = payload;
                         const kaspiData = await orderKaspiCustomPrice({
                             ...customPriceData,
                             event_id: customPriceData.event_id!,
-                            amount: customPriceData.amount!
+                            amount: customPriceData.amount!,
+                            currency: "KZT" // Kaspi только KZT
                         });
                         console.log("kaspiData", kaspiData);
                         setPaymentData(kaspiData);
                     } else {
                         // Если событие с фиксированной ценой, используем обычный эндпоинт
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        const { paymentMethod, department_id, amount, ...dataWithoutPaymentMethodAndDepartment } = payload;
-                        const kaspiData = await orderKaspi(dataWithoutPaymentMethodAndDepartment);
+                        const { paymentMethod, department_id, amount, residencyStatus, ...dataWithoutPaymentMethodAndDepartment } = payload;
+                        const kaspiData = await orderKaspi({
+                            ...dataWithoutPaymentMethodAndDepartment,
+                            currency: "KZT" // Kaspi только KZT
+                        });
                         console.log("kaspiData", kaspiData);
                         setPaymentData(kaspiData);
                     }
@@ -188,18 +218,22 @@ export const PaymentForm: FC = () => {
                     if (selectedEventPriced === false) {
                         // Если событие без фиксированной цены, используем эндпоинт event-custom-price
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        const { paymentMethod, department_id, promo_code, ...customPriceData } = payload;
+                        const { paymentMethod, department_id, promo_code, residencyStatus, ...customPriceData } = payload;
                         setPaymentData(await orderHalykCustomPrice({
                             ...customPriceData,
                             event_id: customPriceData.event_id!,
-                            amount: customPriceData.amount!
+                            amount: customPriceData.amount!,
+                            currency
                         }));
                         setShowWidget(true);
                     } else {
                         // Если событие с фиксированной ценой, используем обычный эндпоинт
                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                        const { paymentMethod, department_id, amount, ...dataWithoutPaymentMethodAndDepartment } = payload;
-                        setPaymentData(await orderHalyk(dataWithoutPaymentMethodAndDepartment));
+                        const { paymentMethod, department_id, amount, residencyStatus, ...dataWithoutPaymentMethodAndDepartment } = payload;
+                        setPaymentData(await orderHalyk({
+                            ...dataWithoutPaymentMethodAndDepartment,
+                            currency
+                        }));
                         setShowWidget(true);
                     }
                 }
@@ -209,16 +243,22 @@ export const PaymentForm: FC = () => {
             }else if(selectedDepartmentType==="SELF_PAY"){
                 if (data.paymentMethod === "KaspiBank") {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { paymentMethod, event_id, promo_code, ...dataWithoutPaymentMethodAndDepartment } = payload;
+                    const { paymentMethod, event_id, promo_code, residencyStatus, ...dataWithoutPaymentMethodAndDepartment } = payload;
 
-                    const kaspiData = await orderSelfKaspi(dataWithoutPaymentMethodAndDepartment);
+                    const kaspiData = await orderSelfKaspi({
+                        ...dataWithoutPaymentMethodAndDepartment,
+                        currency: "KZT" // Kaspi только KZT
+                    });
                     console.log("kaspiData", kaspiData);
                     setPaymentData(kaspiData);
 
                 }else if (data.paymentMethod === "HalykBank") {
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    const { paymentMethod, event_id, promo_code, ...dataWithoutPaymentMethodAndDepartment } = payload;
-                    setPaymentData(await orderSelfHalyk(dataWithoutPaymentMethodAndDepartment));
+                    const { paymentMethod, event_id, promo_code, residencyStatus, ...dataWithoutPaymentMethodAndDepartment } = payload;
+                    setPaymentData(await orderSelfHalyk({
+                        ...dataWithoutPaymentMethodAndDepartment,
+                        currency: "KZT" // Self-pay всегда KZT
+                    }));
                     setShowWidget(true);
                 }
             }
@@ -359,35 +399,90 @@ export const PaymentForm: FC = () => {
                 {selectedDepartmentId && (
                     <>
                         {selectedDepartmentType==="EVENT_BASED" ? (
-                            <Controller
-                            name="event_id"
-                            control={control}
-                            render={({ field }) => (
-                                <>
-                                    <CustomSelect
-                                        {...field}
-                                        options={eventOptions}
-                                        value={field.value || ''}
-                                        onChange={(val) => {
-                                            field.onChange(val);
-                                            setOrderField("event_id", val);
+                            <>
+                                <Controller
+                                    name="event_id"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <>
+                                            <CustomSelect
+                                                {...field}
+                                                options={eventOptions}
+                                                value={field.value || ''}
+                                                onChange={(val) => {
+                                                    field.onChange(val);
+                                                    setOrderField("event_id", val);
 
-                                            const selectedEvent = eventOptions.find(e => e.value === val);
-                                            if (selectedEvent && "price" in selectedEvent) {
-                                                setPrice(Number((selectedEvent as IEvent).price));
-                                                setSelectedEventPriced((selectedEvent as any).priced ?? true);
-                                            }
-                                        }}
-                                        triggerClassName={"text-white"}
-                                        placeholder={t('paymentPage.inputs.selectEvPH')}
-                                        error={errors.event_id?.message}
-                                    />
-                                    {errors.event_id && (
-                                        <p className="text-red-500 text-sm -mt-2 ml-2">{errors.event_id.message}</p>
+                                                    const selectedEvent = eventOptions.find(e => e.value === val);
+                                                    if (selectedEvent && "price" in selectedEvent) {
+                                                        setPrice(Number((selectedEvent as IEvent).price));
+                                                        setSelectedEventPriced((selectedEvent as any).priced ?? true);
+                                                        setSelectedEventPriceKzt(Number((selectedEvent as any).price || 0));
+                                                        setSelectedEventPriceUsd((selectedEvent as any).price_usd || null);
+                                                    }
+                                                }}
+                                                triggerClassName={"text-white"}
+                                                placeholder={t('paymentPage.inputs.selectEvPH')}
+                                                error={errors.event_id?.message}
+                                            />
+                                            {errors.event_id && (
+                                                <p className="text-red-500 text-sm -mt-2 ml-2">{errors.event_id.message}</p>
+                                            )}
+                                        </>
                                     )}
-                                </>
-                            )}
-                        />): null}
+                                />
+                                <Controller
+                                    name="residencyStatus"
+                                    control={control}
+                                    render={({ field }) => (
+                                        <>
+                                            <CustomSelect
+                                                {...field}
+                                                options={[
+                                                    { label: "Resident", value: "resident" },
+                                                    { label: "Non-resident", value: "non-resident" }
+                                                ]}
+                                                value={field.value || ''}
+                                                onChange={(val) => {
+                                                    field.onChange(val);
+                                                    // Auto-fill amount and currency based on residency status
+                                                    if (selectedEventPriced) {
+                                                        if (val === "resident") {
+                                                            setValue("amount", selectedEventPriceKzt);
+                                                            setPrice(selectedEventPriceKzt || 0);
+                                                            setCurrency("KZT");
+                                                        } else if (val === "non-resident") {
+                                                            if (selectedEventPriceUsd) {
+                                                                setValue("amount", selectedEventPriceUsd);
+                                                                setPrice(selectedEventPriceUsd || 0);
+                                                                setCurrency("USD");
+                                                            } else {
+                                                                // Fallback to KZT price if USD not available
+                                                                toast.error("USD price not available for this event. Using KZT price instead.");
+                                                                setValue("amount", selectedEventPriceKzt);
+                                                                setPrice(selectedEventPriceKzt || 0);
+                                                                setCurrency("KZT");
+                                                            }
+                                                        }
+                                                    }
+                                                }}
+                                                triggerClassName={"text-white"}
+                                                placeholder="Select Residency Status"
+                                                error={errors.residencyStatus?.message}
+                                            />
+                                            {errors.residencyStatus && (
+                                                <p className="text-red-500 text-sm -mt-2 ml-2">{errors.residencyStatus.message}</p>
+                                            )}
+                                            {field.value === "non-resident" && !selectedEventPriceUsd && selectedEventPriced && (
+                                                <p className="text-yellow-600 text-sm -mt-2 ml-2">
+                                                    ⚠️ USD price not available. KZT price will be used.
+                                                </p>
+                                            )}
+                                        </>
+                                    )}
+                                />
+                            </>
+                        ): null}
                         {additionalFields.map((field) => {
                             const key = field.name;
 
@@ -441,6 +536,11 @@ export const PaymentForm: FC = () => {
                                     />
                                     {errors.paymentMethod && (
                                         <p className="text-red-500 text-sm -mt-2 ml-2">{errors.paymentMethod.message}</p>
+                                    )}
+                                    {watchResidencyStatus === "non-resident" && watchPaymentMethod === "KaspiBank" && (
+                                        <p className="text-red-500 text-sm -mt-2 ml-2">
+                                            ⚠️ Kaspi Bank does not support USD payments for non-residents. Please select HalykBank.
+                                        </p>
                                     )}
                                 </>
                             )}
@@ -526,6 +626,7 @@ export const PaymentForm: FC = () => {
 
                 {paymentData && (
                     <PaymentHalyk
+                        currency={paymentData.order.currency}
                         showWidget={showWidget}
                         amount={paymentData.order.final_amount}
                         terminalId={paymentData.terminal_id}

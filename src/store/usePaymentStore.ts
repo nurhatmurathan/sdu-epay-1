@@ -9,9 +9,11 @@ interface PaymentState {
     discount: number;
     loading: boolean;
     finalPrice: number;
+    currency: "KZT" | "USD";
     error: string | null;
     setOrderField: <K extends keyof IOrder>(key: K, value: IOrder[K]) => void;
     setPrice: (price: number) => void;
+    setCurrency: (currency: "KZT" | "USD") => void;
     verifyPromo: (payload: VerifyPromocodePayload) => Promise<string | null>;
     applyPromo: (promoCode: string) => void;
     setLoading: (loading: boolean) => void;
@@ -35,6 +37,7 @@ export const usePaymentStore = create<PaymentState>((set) => ({
     price: 0,
     discount: 0,
     finalPrice: 0,
+    currency: "KZT",
     loading: false,
     error: null,
 
@@ -54,6 +57,8 @@ export const usePaymentStore = create<PaymentState>((set) => ({
             finalPrice,
         };
     }),
+
+    setCurrency: (currency) => set({ currency }),
 
     verifyPromo: async (payload) => {
         set({ loading: true, error: null });
@@ -104,6 +109,7 @@ export const usePaymentStore = create<PaymentState>((set) => ({
             price: 0,
             discount: 0,
             finalPrice: 0,
+            currency: "KZT",
             loading: false,
             error: null,
         }),

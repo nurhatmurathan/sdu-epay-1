@@ -11,6 +11,7 @@ export const orderKaspi = async (order: Omit<{
     additional: string;
     paymentMethod: string;
     amount?: number | null;
+    currency?: "KZT" | "USD";
     additional_fields: Record<string, string | boolean>
 }, "paymentMethod" | "department_id">): Promise<PaymentResponseKaspi> => {
     const {data} = await api.post("/orders/public/kaspi", order);
@@ -28,6 +29,7 @@ export const orderHalyk = async (order: Omit<{
     additional: string;
     paymentMethod: string;
     amount?: number | null;
+    currency?: "KZT" | "USD";
     additional_fields: Record<string, string | boolean>
 }, "paymentMethod" | "department_id">): Promise<PaymentResponseKaspi> => {
     const {data} = await api.post("/orders/public/epay", order);
@@ -45,6 +47,7 @@ export const orderSelfKaspi = async (order: Omit<{
     additional: string;
     paymentMethod: string;
     amount: number | null;
+    currency?: "KZT" | "USD";
     additional_fields: Record<string, string | boolean>
 }, "paymentMethod" | "promo_code" | "event_id">): Promise<PaymentResponseKaspi> => {
     const {data} = await api.post("/orders/public/kaspi/self-pay", order);
@@ -62,6 +65,7 @@ export const orderSelfHalyk = async (order: Omit<{
     additional: string;
     paymentMethod: string;
     amount: number | null;
+    currency?: "KZT" | "USD";
     additional_fields: Record<string, string | boolean>
 }, "paymentMethod" | "promo_code" | "event_id">): Promise<PaymentResponseKaspi> => {
     const {data} = await api.post("/orders/public/epay/self-pay", order);
@@ -77,6 +81,7 @@ export const orderKaspiCustomPrice = async (order: {
     additional: string;
     additional_fields: Record<string, string | boolean>;
     amount: number;
+    currency?: "KZT" | "USD";
 }): Promise<PaymentResponseKaspi> => {
     const {data} = await api.post("/orders/public/kaspi/event-custom-price", order);
 
@@ -91,6 +96,7 @@ export const orderHalykCustomPrice = async (order: {
     additional: string;
     additional_fields: Record<string, string | boolean>;
     amount: number;
+    currency?: "KZT" | "USD";
 }): Promise<PaymentResponseKaspi> => {
     const {data} = await api.post("/orders/public/epay/event-custom-price", order);
 

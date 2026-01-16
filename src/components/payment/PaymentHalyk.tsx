@@ -7,6 +7,7 @@ interface PaymentHalykProps {
     terminalId: string;
     orderId: string;
     successUrl: string;
+    currency: string
     failUrl: string;
     email: string;
     oauthData: {
@@ -25,6 +26,7 @@ export const PaymentHalyk: FC<PaymentHalykProps> = ({
                                                         terminalId,
                                                         orderId,
                                                         successUrl,
+                                                        currency,
                                                         failUrl,
                                                         email,
                                                         oauthData,
@@ -38,6 +40,7 @@ export const PaymentHalyk: FC<PaymentHalykProps> = ({
             amount={amount}
             invoiceId={orderId}
             oauthData={oauthData}
+            currency={currency}
             paymentData={{
                 backLink: successUrl,
                 failureBackLink: failUrl,

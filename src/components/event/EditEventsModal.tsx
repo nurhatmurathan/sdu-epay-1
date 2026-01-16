@@ -4,7 +4,6 @@ import {Department} from "@/types/departments.ts";
 import {useEventsStore} from "@/store/useEventsStore.ts";
 import {CustomInput} from "@/ui/CustomInput.tsx";
 import {
-    CurrencyDollarIcon,
     EnvelopeIcon,
     InformationCircleIcon,
 } from "@heroicons/react/24/outline";
@@ -13,6 +12,8 @@ import {CustomModal} from "@/ui/CustomModal.tsx";
 import {Calendar} from "primereact/calendar";
 import {CustomSelect} from "@/ui/CustomSelect.tsx";
 import { toast } from "react-hot-toast";
+import {TengeIcon} from "@/assets/TengeIcon.tsx";
+import {CurrencyDollarIcon} from "@heroicons/react/24/outline";
 
 interface EditEventsModalProps {
     isOpen: boolean;
@@ -23,6 +24,7 @@ interface EditEventsModalProps {
         manager_email: string;
         priced: boolean;
         price: number;
+        price_usd?: number;
         without_period: boolean;
         period_from: string;
         period_till: string;
@@ -37,12 +39,13 @@ export const EditEventsModal: FC<EditEventsModalProps> = ({isOpen, onClose, even
     const [title, setTitle] = useState(eventData.title);
     const [email, setEmail] = useState(eventData.manager_email);
     const [price, setPrice] = useState(eventData.price);
+    const [priceUsd, setPriceUsd] = useState(eventData.price_usd || 0);
     const [priced, setPriced] = useState(eventData.priced);
     const [withoutPeriod, setWithoutPeriod] = useState(eventData.without_period);
     const [selectedDepartment, setSelectedDepartment] = useState(eventData.department.id);
     const [dates, setDates] = useState<Date[] | null>(
-        eventData.without_period 
-            ? null 
+        eventData.without_period
+            ? null
             : [new Date(eventData.period_from), new Date(eventData.period_till)]
     );
     const [errors, setErrors] = useState({
@@ -50,6 +53,7 @@ export const EditEventsModal: FC<EditEventsModalProps> = ({isOpen, onClose, even
         email: false,
         department: false,
         price: false,
+        priceUsd: false,
         dates: false,
     });
     const [departments, setDepartments] = useState<{ label: string; value: string }[]>([]);
@@ -61,6 +65,7 @@ export const EditEventsModal: FC<EditEventsModalProps> = ({isOpen, onClose, even
             setTitle(eventData.title);
             setEmail(eventData.manager_email);
             setPrice(eventData.price);
+            setPriceUsd(eventData.price_usd || 0);
             setPriced(eventData.priced);
             setWithoutPeriod(eventData.without_period);
             setSelectedDepartment(eventData.department.id);
@@ -106,6 +111,7 @@ export const EditEventsModal: FC<EditEventsModalProps> = ({isOpen, onClose, even
             email: !email.trim() || !emailRegex.test(email),
             department: !selectedDepartment,
             price: priced && (!price || price <= 0),
+            priceUsd: priced && priceUsd < 0,
             dates: !withoutPeriod && (!from || !till),
         };
 
@@ -120,7 +126,8 @@ export const EditEventsModal: FC<EditEventsModalProps> = ({isOpen, onClose, even
             messages.push("Неверный формат email.");
         }
         if (newErrors.department) messages.push("Необходимо выбрать департамент.");
-        if (newErrors.price) messages.push("Укажите корректную цену.");
+        if (newErrors.price) messages.push("Укажите корректную цену в KZT.");
+        if (newErrors.priceUsd) messages.push("Цена в USD не может быть отрицательной.");
         if (newErrors.dates) messages.push("Укажите период проведения мероприятия.");
 
 
@@ -136,9 +143,10 @@ export const EditEventsModal: FC<EditEventsModalProps> = ({isOpen, onClose, even
                 department_id: selectedDepartment,
                 priced: priced,
                 price: priced ? price : 0,
+                price_usd: priced && priceUsd > 0 ? priceUsd : undefined,
                 without_period: withoutPeriod,
-                ...(withoutPeriod 
-                    ? {} 
+                ...(withoutPeriod
+                    ? {}
                     : { period_from: from!, period_till: till! }
                 ),
             });
@@ -194,13 +202,22 @@ export const EditEventsModal: FC<EditEventsModalProps> = ({isOpen, onClose, even
                 </div>
 
                 {priced && (
-                    <CustomInput
-                        icon={<CurrencyDollarIcon className={errors.price ? " text-red-500" : "text-[#6B9AB0]"} />}
-                        placeholder="Введите сумму"
-                        type="number"
-                        value={String(price)}
-                        onChange={(e) => setPrice(Number(e.target.value))}
-                    />
+                    <>
+                        <CustomInput
+                            icon={<TengeIcon color={errors.price ? "#fb2c36" : "#6B9AB0"} />}
+                            placeholder="Введите цену в KZT (обязательно)"
+                            type="number"
+                            value={String(price)}
+                            onChange={(e) => setPrice(Number(e.target.value))}
+                        />
+                        <CustomInput
+                            icon={<CurrencyDollarIcon className={errors.priceUsd ? "text-red-500" : "text-[#6B9AB0]"} />}
+                            placeholder="Введите цену в USD (опционально)"
+                            type="number"
+                            value={String(priceUsd)}
+                            onChange={(e) => setPriceUsd(Number(e.target.value))}
+                        />
+                    </>
                 )}
 
                 <div className="flex items-center gap-2">
